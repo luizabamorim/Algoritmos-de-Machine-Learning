@@ -1,16 +1,65 @@
 
 rm(list = ls()) #Limpa memória do R
 
+
 ###Pacotes
-library(ggplot2) #Biblioteca pra gerar visualizacoes mais sofisticadas
-library(plotly) #Biblioteca pra gerar visualizacoes mais sofisticadas
-#Cria o data frame
-dados <- data.frame(Vendas_Cafe = c(18, 20, 23, 23, 23, 23, 24, 25, 26, 26, 26, 26, 27, 28, 28,
-                                    29, 29, 30, 30, 31, 31, 33, 34, 35, 38, 39, 41, 44, 44, 46),
-                    Preco_Cafe = c(4.77, 4.67, 4.75, 4.74, 4.63, 4.56, 4.59, 4.75, 4.75, 4.49,
-                                   4.41, 4.32, 4.68, 4.66, 4.42, 4.71, 4.66, 4.46, 4.36, 4.47, 4.43,
-                                   4.4, 4.61, 4.09, 3.73, 3.89, 4.35, 3.84, 3.81, 3.79),
-                    Promocao = c("Nao", "Nao", "Nao", "Nao", "Nao", "Nao", "Nao", "Nao", "Sim",
-                                 "Nao", "Sim", "Nao", "Nao", "Sim", "Sim", "Nao", "Sim", "Sim",
-                                 "Sim", "Nao", "Nao", "Sim", "Sim", "Sim", "Nao", "Sim", "Sim",
-                                 "Sim", "Sim", "Sim"),
+install.packages("ggplot2")
+install.packages("plotly")
+
+library(ggplot2) #Biblioteca pra gerar visualizacoes
+library(plotly) #Biblioteca pra gerar visualizacoes 
+
+#Criando o data frame
+VendasCafe=c(18, 20, 23, 23, 23, 23, 24, 25, 26, 26, 26, 26, 27, 28, 28,
+         29, 29, 30, 30, 31, 31, 33, 34, 35, 38, 39, 41, 44, 44, 46)
+PrecoCafe=c(4.77, 4.67, 4.75, 4.74, 4.63, 4.56, 4.59, 4.75, 4.75, 4.49,
+        4.41, 4.32, 4.68, 4.66, 4.42, 4.71, 4.66, 4.46, 4.36, 4.47, 4.43,
+        4.4, 4.61, 4.09, 3.73, 3.89, 4.35, 3.84, 3.81, 3.79)
+
+Promocao=c("Nao", "Nao", "Nao", "Nao", "Nao", "Nao", "Nao", "Nao", "Sim",
+           "Nao", "Sim", "Nao", "Nao", "Sim", "Sim", "Nao", "Sim", "Sim",
+           "Sim", "Nao", "Nao", "Sim", "Sim", "Sim", "Nao", "Sim", "Sim",
+           "Sim", "Sim", "Sim")
+PrecoLeite=c(4.74, 4.81, 4.36, 4.29, 4.17, 4.66, 4.73, 4.11, 4.21, 4.25,
+                             4.62, 4.53, 4.44, 4.19, 4.37, 4.29, 4.57, 4.21, 4.77, 4, 4.31,
+                             4.34, 4.05, 4.73, 4.07, 4.75, 4, 4.15, 4.34, 4.15)
+dados=data.frame(VendasCafe,PrecoCafe,Promocao,PrecoLeite)
+
+#Visualização de Dados
+View(dados)
+
+graf_dados=ggplot(dados,aes(y=VendasCafe,x=PrecoCafe))+
+  geom_point()+
+  labs( y = "Vendas de Café", x = "Preço do Café")+
+  geom_smooth(method = 'lm')+
+  theme_bw()
+
+#graf_dados  
+ggplotly(graf_dados)
+
+#Correlação entre as vendas de Café e o Preço
+cor(dados$VendasCafe,dados$PrecoCafe) 
+
+graf_box=ggplot(dados,aes(y=VendasCafe,x=Promocao,col=Promocao))+
+  geom_boxplot()
+
+ggplotly(graf_box)
+
+
+###Modelo de Regressão Linear
+modelo=lm(VendasCafe~PrecoCafe+PrecoLeite+Promocao,data=dados)
+summary(modelo)
+
+#Resíduos
+par(mfrow=c(2,2))
+plot(modelo,pch=16)
+
+
+##Criando uma variável aleatória 
+nova_variavel = rpois(n = 30, lambda = 2)
+fit2 <- lm(VendasCafe ~ PrecoCafe + Promocao + PrecoLeite + nova_variavel, data = dados)
+summary(fit2)
+fit3=step(fit2,direction='both')
+
+#Removeu a variável aleatória
+summary(fit3)
